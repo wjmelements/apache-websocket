@@ -100,10 +100,10 @@ static apr_status_t mod_websocket_cleanup_config(void *data)
     return APR_SUCCESS;
 }
 
+static char msg[200];
 static const char *mod_websocket_conf_handler(cmd_parms *cmd, void *confv, const char *path, const char *name)
 {
     websocket_config_rec *conf = (websocket_config_rec *) confv;
-    char *response;
 
     if ((conf != NULL) && (path != NULL) && (name != NULL)) {
         apr_dso_handle_t *res_handle = NULL;
@@ -119,26 +119,27 @@ static const char *mod_websocket_conf_handler(cmd_parms *cmd, void *confv, const
                     conf->res_handle = res_handle;
                     conf->plugin = plugin;
                     apr_pool_cleanup_register(cmd->pool, conf, mod_websocket_cleanup_config, apr_pool_cleanup_null);
-                    response = NULL;
+                    return NULL;
                 }
                 else {
                     apr_dso_unload(res_handle);
-                    response = "Invalid response from initialization function";
+                    return "Invalid response from initialization function";
                 }
             }
             else {
                 apr_dso_unload(res_handle);
-                response = "Could not find initialization function in module";
+                return "Could not find initialization function in module";
             }
         }
         else {
-            response = "Could not open WebSocket handler module";
+            char* buffer = strncpy(msg, "Could not open WebSocket handler module: ", 200);
+            apr_dso_error(res_handle, buffer, 200 - (buffer-msg));
+            return msg;
         }
     }
     else {
-        response = "Invalid parameters";
+        return "Invalid parameters";
     }
-    return response;
 }
 
 /*
