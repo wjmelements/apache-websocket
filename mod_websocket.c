@@ -175,7 +175,7 @@ static const char *mod_websocket_conf_handler(cmd_parms *cmd, void *confv,
         }
         else {
             char* buffer = strncpy(msg, "Could not open WebSocket handler module: ", 200);
-            apr_dso_error(res_handle, buffer, 200 - (buffer-msg));
+            apr_dso_error(res_handle, buffer, 200 - (buffer - msg));
             return msg;
         }
     }
@@ -272,7 +272,7 @@ static size_t CALLBACK mod_websocket_protocol_count(const WebSocketServer *serve
 static const char *CALLBACK mod_websocket_protocol_index(const WebSocketServer *server,
                                                          const size_t index)
 {
-    if ((index >= 0) && (index < mod_websocket_protocol_count(server))) {
+    if (index < mod_websocket_protocol_count(server)) {
         return APR_ARRAY_IDX(server->state->protocols, index, char *);
     }
     return NULL;

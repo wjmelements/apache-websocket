@@ -221,7 +221,7 @@ static size_t CALLBACK mod_websocket_protocol_count(const struct _WebSocketServe
 
 static const char *CALLBACK mod_websocket_protocol_index(const struct _WebSocketServer *server, const size_t index)
 {
-    if ((index >= 0) && (index < mod_websocket_protocol_count(server))) {
+    if (index < mod_websocket_protocol_count(server)) {
         return APR_ARRAY_IDX(server->state->protocols, index, char *);
     }
     return NULL;
